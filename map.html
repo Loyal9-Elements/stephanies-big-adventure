@@ -18,16 +18,27 @@
   }
   .bg {
     position: absolute;
+    width: 200vw;
+    height: 200vh;
+    top: 0;
+    left: 0;
+    background: url('assets/img/map.png') 0 0 / 100% 100% no-repeat;
+    transition: top 1.5s ease-in-out, left 1.5s ease-in-out;
+  }
+  .quadrant {
+    position: absolute;
     width: 100vw;
     height: 100vh;
-    background: url('assets/img/map.png') 0% 0% / 200% 200% no-repeat;
-    transition: background-position 1.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .overlay {
+  .q1 { top: 0; left: 0; }
+  .q2 { top: 0; left: 100vw; }
+  .q3 { top: 100vh; left: 0; }
+  .q4 { top: 100vh; left: 100vw; }
+  .overlay, .video-overlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     max-width: 70vw;
     max-height: 70vh;
     z-index: 1;
@@ -35,9 +46,14 @@
     transition: opacity 2s ease-in-out;
     pointer-events: none;
   }
-  .overlay.show { opacity: 1; }
+  .overlay.show { opacity: 0.5; }
+  .video-overlay.show { opacity: 0.5; }
+  .video-overlay {
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at center, black 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 80% at center, black 50%, transparent 100%);
+  }
   .btn {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -66,11 +82,24 @@
 </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div>
-  <img class="overlay" id="o1" src="assets/img/map1.png" alt="Panel 1">
-  <img class="overlay" id="o2" src="assets/img/map2.png" alt="Panel 2">
-  <img class="overlay" id="o3" src="assets/img/map3.png" alt="Panel 3">
-  <img class="overlay" id="o4" src="assets/img/map4.png" alt="Panel 4">
+  <div class="bg" id="bg">
+    <div class="quadrant q1">
+      <img class="overlay" id="o1" src="assets/img/map1.png" alt="Panel 1">
+      <video class="video-overlay" id="v1" src="assets/webm/goonies-clip.webm" muted playsinline></video>
+    </div>
+    <div class="quadrant q2">
+      <img class="overlay" id="o2" src="assets/img/map2.png" alt="Panel 2">
+      <video class="video-overlay" id="v2" src="assets/webm/adventure-clip.webm" muted playsinline></video>
+    </div>
+    <div class="quadrant q3">
+      <img class="overlay" id="o3" src="assets/img/map3.png" alt="Panel 3">
+      <video class="video-overlay" id="v3" src="assets/webm/indiana-jones-clip.webm" muted playsinline></video>
+    </div>
+    <div class="quadrant q4">
+      <img class="overlay" id="o4" src="assets/img/map4.png" alt="Panel 4">
+      <video class="video-overlay" id="v4" src="assets/webm/big-trouble-clip.webm" muted playsinline></video>
+    </div>
+  </div>
   <button class="btn" id="startBtn">Open The Map 🗺️</button>
   <button class="btn" id="endBtn" style="opacity:0;pointer-events:none">To Be Continued...</button>
   <audio id="theme" src="assets/mp3/indiana-jones-theme.mp3" loop></audio>
@@ -85,37 +114,57 @@
         document.getElementById('o3'),
         document.getElementById('o4')
       ];
+      const videos = [
+        document.getElementById('v1'),
+        document.getElementById('v2'),
+        document.getElementById('v3'),
+        document.getElementById('v4')
+      ];
       const btn = this;
 
       music.play();
       btn.style.opacity = '0';
       btn.style.pointerEvents = 'none';
 
-      const positions = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'];
+      const pans = [
+        { left: '0', top: '0' },
+        { left: '-100vw', top: '0' },
+        { left: '0', top: '-100vh' },
+        { left: '-100vw', top: '-100vh' },
+      ];
       const hold = 6500;
       const fade = 2000;
 
-      // Show first overlay immediately
+      // Show first image, then swap to video
       overlays[0].classList.add('show');
+      setTimeout(() => {
+        overlays[0].classList.remove('show');
+        videos[0].classList.add('show');
+        videos[0].play();
+      }, fade);
 
-      for (let i = 1; i < positions.length; i++) {
-        // Fade out current overlay
+      for (let i = 1; i < pans.length; i++) {
+        // Pan to next quadrant
         setTimeout(() => {
-          overlays[i - 1].classList.remove('show');
-        }, hold * i - fade);
-
-        // Pan background then fade in next overlay
-        setTimeout(() => {
-          bg.style.backgroundPosition = positions[i];
+          bg.style.left = pans[i].left;
+          bg.style.top = pans[i].top;
+          // Fade in image, then swap to video
           setTimeout(() => {
             overlays[i].classList.add('show');
-          }, 1500); // wait for pan to finish
+            setTimeout(() => {
+              overlays[i].classList.remove('show');
+              videos[i].classList.add('show');
+              videos[i].play();
+            }, fade);
+          }, 1500);
         }, hold * i);
       }
 
-      // Fade out last overlay, then show end button
+      // Fade out last video after 3s, then show end button
       setTimeout(() => {
-        overlays[positions.length - 1].classList.remove('show');
+        setTimeout(() => {
+          videos[pans.length - 1].classList.remove('show');
+        }, 3000);
         setTimeout(() => {
           const endBtn = document.getElementById('endBtn');
           endBtn.style.opacity = '1';
@@ -127,7 +176,7 @@
             goonies.play();
           });
         }, fade);
-      }, hold * positions.length - fade);
+      }, hold * pans.length - fade);
     });
   </script>
 </body>
