@@ -2,113 +2,195 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link rel="icon" type="image/png" href="assets/img/apple-touch.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch.png">
-<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-<title>Stephanie's Big Adventure</title>
+<title>GAME OVER</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: url('assets/img/background-image.png') center/contain no-repeat;
-    background-color: #000;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
   }
-  .title {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    max-width: 40vw;
-    z-index: 1;
-    opacity: 0;
-    transform: translateX(-50%) scale(0);
-    animation: titleEntrance 1s ease-out forwards, float 3s ease-in-out 1s infinite;
-  }
-  .bike {
-    position: absolute;
-    bottom: 10%;
-    left: 10%;
-    max-width: 30vw;
-    z-index: 2;
 
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.18) 3px,
+      rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
   }
-  @keyframes titleEntrance {
-    to { opacity: 1; transform: translateX(-50%) scale(1); }
+
+  #screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
   }
-  @keyframes float {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-20px); }
+
+  #game-over {
+    font-size: clamp(3rem, 14vw, 8rem);
+    color: #ff0000;
+    text-shadow:
+      4px 4px 0 #800000,
+      0 0 20px #ff0000,
+      0 0 60px #ff000088,
+      0 0 100px #ff000044;
+    animation: flicker 3s infinite, glitch 6s infinite;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    text-align: center;
   }
-  .btn {
-    position: absolute;
-    bottom: 8%;
+
+  #score-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    color: #fff;
+    font-size: clamp(0.5rem, 2vw, 0.85rem);
+    text-shadow: 0 0 8px #fff;
+    animation: fadeInUp 1s ease 0.8s both;
+  }
+
+  #score-block .label { color: #aaa; }
+  #score-block .value { color: #ffd700; font-size: 1.4em; text-shadow: 0 0 10px #ffd700; }
+
+  #insert-coin {
+    font-size: clamp(0.55rem, 2vw, 0.9rem);
+    color: #fff;
+    animation: blink 1s step-end infinite, fadeInUp 1s ease 1.4s both;
+    text-shadow: 0 0 8px #fff;
+  }
+
+  #try-again-btn {
+    margin-top: 0.5rem;
+    padding: 0.7em 1.8em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.6rem, 2.5vw, 1rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000, 0 0 20px #ffd70088;
+    animation: fadeInUp 1s ease 1.8s both;
+    transition: transform 0.1s;
+  }
+  #try-again-btn:hover { transform: scale(1.05); }
+  #try-again-btn:active { transform: scale(0.97); }
+
+  #fine-print {
+    position: fixed;
+    bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 3;
-    padding: 1em 2em;
-    font-family: 'Bangers', 'Comic Sans MS', cursive;
-    font-size: clamp(1.2rem, 3vw, 2.5rem);
-    color: #000;
-    background: #f5f0e1;
-    border: 4px solid #000;
-    border-radius: 12px;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 6px 6px 0 #000;
-    transition: transform 0.1s, box-shadow 0.1s;
+    font-size: clamp(0.35rem, 1.2vw, 0.55rem);
+    color: #444;
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: 0.08em;
+    animation: fadeInUp 1s ease 2.4s both;
   }
-  .btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 8px 8px 0 #000;
+
+  /* Floating pixel debris */
+  .pixel {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: #ff0000;
+    opacity: 0;
+    animation: fall linear infinite;
   }
-  .btn:active {
-    transform: translateX(-50%) scale(0.97);
-    box-shadow: 3px 3px 0 #000;
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.4; }
+    97% { opacity: 1; }
+    98% { opacity: 0.2; }
+    99% { opacity: 1; }
   }
-  @keyframes flyout {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(150vw, -150vh) rotate(-25deg); }
+
+  @keyframes glitch {
+    0%, 90%, 100% { text-shadow: 4px 4px 0 #800000, 0 0 20px #ff0000, 0 0 60px #ff000088; transform: none; }
+    91% { transform: translate(-4px, 0) skewX(-2deg); text-shadow: -4px 4px 0 #00ffff, 4px -4px 0 #ff00ff; }
+    92% { transform: translate(4px, 0) skewX(2deg); text-shadow: 4px 4px 0 #800000, 0 0 20px #ff0000; }
+    93% { transform: none; }
   }
-  @media (max-width: 1024px) and (orientation: landscape) {
-    body { background-size: cover; }
-    .title { max-width: 70vw; }
-    .bike { max-width: 50vw; bottom: 5%; left: 5%; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
-  @media (max-width: 1024px) and (orientation: portrait) {
-    body { background-image: url('assets/img/background-image-portrait.png'); background-size: cover; }
-    .title { max-width: 140vw; }
-    .bike { max-width: 100vw; bottom: 5%; left: 5%; }
-    .btn { bottom: auto; top: 50%; transform: translate(-50%, -50%); }
-    .btn:hover { transform: translate(-50%, -50%) scale(1.05); }
-    .btn:active { transform: translate(-50%, -50%) scale(0.97); }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fall {
+    0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
   }
 </style>
 </head>
 <body>
-  <img class="title" src="assets/img/title.png" alt="Title">
-  <img class="bike" src="assets/img/bike.png" alt="Bike">
-  <button class="btn" id="mainBtn">Click Me, I Dare You</button>
-  <audio id="music" src="assets/mp3/pee-wee-music.mp3" loop></audio>
-  <audio id="laugh" src="assets/mp3/pee-wees-laugh.mp3" preload="auto"></audio>
-  <script>
-    const btn = document.getElementById('mainBtn');
-    let stage = 0;
-    btn.addEventListener('click', () => {
-      if (stage === 0) {
-        document.getElementById('music').play();
-        btn.textContent = "Let's Ride! \uD83D\uDEB2";
-        stage = 1;
-      } else {
-        document.getElementById('music').pause();
-        document.getElementById('laugh').play();
-        document.querySelector('.bike').style.animation = 'flyout 8s ease-in forwards';
-        btn.disabled = true;
-        setTimeout(() => window.location.href = 'mario.html', 4000);
-      }
-    });
-  </script>
+
+<div id="screen">
+  <div id="game-over">GAME<br>OVER</div>
+
+  <div id="score-block">
+    <span class="label">CONNECTION LOST</span>
+    <span class="value">ERR_DISCONNECTED</span>
+  </div>
+
+  <div id="insert-coin">— INSERT COIN —</div>
+
+  <button id="try-again-btn" onclick="window.location.href='pee-wee.html'">TRY AGAIN</button>
+</div>
+
+<div id="fine-print">you disconnected. try again.</div>
+
+<audio id="music" src="assets/mp3/queen.mp3" loop preload="auto"></audio>
+
+<script>
+  // Pixel debris
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'pixel';
+    const colors = ['#ff0000','#ff4400','#ff0044','#ff6600','#ffffff'];
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * -20 + 'vh';
+    p.style.width = p.style.height = (4 + Math.random() * 8) + 'px';
+    p.style.animationDuration = (3 + Math.random() * 6) + 's';
+    p.style.animationDelay = (Math.random() * 5) + 's';
+    document.body.appendChild(p);
+  }
+
+  // Start music on first interaction
+  document.body.addEventListener('click', () => {
+    document.getElementById('music').play();
+  }, { once: true });
+</script>
 </body>
 </html>
