@@ -106,25 +106,25 @@
   <div class="bg" id="bg">
     <div class="quadrant q1">
       <img class="overlay" id="o1" src="assets/img/map1.png" alt="Panel 1">
-      <video class="video-overlay" id="v1" src="assets/webm/goonies-clip.webm" muted playsinline></video>
+      <video class="video-overlay" id="v1" src="assets/webm/goonies-clip.webm" muted playsinline preload="none"></video>
     </div>
     <div class="quadrant q2">
       <img class="overlay" id="o2" src="assets/img/map2.png" alt="Panel 2">
-      <video class="video-overlay" id="v2" src="assets/webm/adventure-clip.webm" muted playsinline></video>
+      <video class="video-overlay" id="v2" src="assets/webm/adventure-clip.webm" muted playsinline preload="none"></video>
     </div>
     <div class="quadrant q3">
       <img class="overlay" id="o3" src="assets/img/map3.png" alt="Panel 3">
-      <video class="video-overlay" id="v3" src="assets/webm/indiana-jones-clip.webm" muted playsinline></video>
+      <video class="video-overlay" id="v3" src="assets/webm/indiana-jones-clip.webm" muted playsinline preload="none"></video>
     </div>
     <div class="quadrant q4">
       <img class="overlay" id="o4" src="assets/img/map4.png" alt="Panel 4">
-      <video class="video-overlay" id="v4" src="assets/webm/big-trouble-clip.webm" muted playsinline></video>
+      <video class="video-overlay" id="v4" src="assets/webm/big-trouble-clip.webm" muted playsinline preload="none"></video>
     </div>
   </div>
   <button class="btn" id="startBtn">Open The Map 🗺️</button>
   <button class="btn" id="endBtn" style="opacity:0;pointer-events:none">Super important detail. Pay attention.</button>
-  <audio id="theme" src="assets/mp3/indiana-jones-theme.mp3" loop></audio>
-  <audio id="goonies" src="assets/mp3/goonies-hey-you-guys.mp3"></audio>
+  <audio id="theme" src="assets/mp3/indiana-jones-theme.mp3" loop preload="none"></audio>
+  <audio id="goonies" src="assets/mp3/goonies-hey-you-guys.mp3" preload="none"></audio>
   <script>
     document.getElementById('startBtn').addEventListener('click', function() {
       const bg = document.getElementById('bg');
