@@ -172,9 +172,14 @@
     width: 100%;
     max-width: 1080px;
   }
-  .controller-wrap img {
-    width: 100%;
-    display: block;
+  #fade {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    z-index: 50;
+    pointer-events: none;
+    transition: opacity 0.8s ease-in;
   }
 </style>
 </head>
@@ -192,6 +197,7 @@
   </div>
   <div id="quitPopup">You can checkout anytime you'd like,<br>but you can never leave 🎸</div>
   <div id="videoOverlay"><video id="brVideo" src="assets/mp4/bohemian-rhapsody.mp4" playsinline></video></div>
+  <div id="fade"></div>
   <button class="start-btn" id="startBtn">Start</button>
   <div class="controller-wrap" id="controllerWrap">
     <img src="assets/mario/controller.png" alt="NES Controller" id="controllerImg">
@@ -655,16 +661,17 @@
     won = true;
     const theme = document.getElementById('theme');
     const pipeSfx = document.getElementById('pipeSfx');
+    const fade = document.getElementById('fade');
     theme.pause();
     pipeSfx.play();
     setSprite(sprites.crouch);
-    marioEl.style.transition = 'top 1s ease-in, opacity 1s ease-in';
+    marioEl.style.transition = 'top 1s ease-in, opacity 0.8s ease-in';
     marioEl.style.top = (pipe.y + pipe.h) + 'px';
     marioEl.style.opacity = '0';
     setTimeout(() => {
-      winMsg.style.display = 'block';
-      setTimeout(() => window.location.href = 'map.html', 2000);
-    }, 1200);
+      fade.style.opacity = '1';
+      setTimeout(() => window.location.href = 'map.html', 900);
+    }, 1000);
   }
 
   update();
