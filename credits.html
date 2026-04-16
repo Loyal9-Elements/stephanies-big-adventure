@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="icon" type="image/png" href="assets/img/apple-touch.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch.png">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Credits</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Press Start 2P', monospace;
+    color: #ffd700;
+  }
+
+  /* CRT scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Starfield */
+  #stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Scroll container */
+  #scroll-wrap {
+    position: absolute;
+    width: 100%;
+    top: 100vh;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.5rem 100vh;
+    gap: 0;
+  }
+
+  #scroll-wrap.rolling {
+    animation: scrollUp 90s linear forwards;
+  }
+
+  @keyframes scrollUp {
+    to { transform: translateY(var(--scroll-dist)); }
+  }
+
+  .crawl-title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.5rem, 10vw, 5rem);
+    color: #ffd700;
+    text-shadow:
+      4px 4px 0 #7a6000,
+      0 0 40px #ffd700cc,
+      0 0 80px #ffd70066;
+    letter-spacing: 0.08em;
+    text-align: center;
+    margin-bottom: 0.2em;
+    line-height: 1;
+  }
+
+  .crawl-subtitle {
+    font-size: clamp(0.35rem, 1.5vw, 0.6rem);
+    color: #aaa;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-label {
+    font-size: clamp(0.4rem, 1.8vw, 0.65rem);
+    color: #ffd700;
+    letter-spacing: 0.2em;
+    text-align: center;
+    margin-top: 3rem;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 0 12px #ffd70088;
+  }
+
+  .credit-block {
+    background: #0a0a0a;
+    border: 2px solid #ffd70044;
+    box-shadow: 0 0 20px #ffd70022, 4px 4px 0 #ffd70033;
+    padding: 1.2em 2em;
+    margin-bottom: 1.2rem;
+    max-width: 680px;
+    width: 90vw;
+    text-align: center;
+  }
+
+  .credit-name {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    color: #fff;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3em;
+  }
+
+  .credit-role {
+    font-size: clamp(0.3rem, 1.3vw, 0.48rem);
+    color: #888;
+    letter-spacing: 0.12em;
+    line-height: 1.8;
+  }
+
+  .credit-role span {
+    color: #ffd700;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: #ffd70055;
+    margin: 3rem auto;
+  }
+
+  .shoutout {
+    max-width: 680px;
+    width: 90vw;
+    background: #0d0d0d;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px #ffd70044, 6px 6px 0 #7a6000;
+    padding: 1.5em 2em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .shoutout p {
+    font-size: clamp(0.32rem, 1.4vw, 0.52rem);
+    color: #ccc;
+    line-height: 2.2;
+    letter-spacing: 0.08em;
+  }
+
+  .shoutout p span {
+    color: #ffd700;
+    text-shadow: 0 0 8px #ffd70088;
+  }
+
+  .love-note {
+    max-width: 680px;
+    width: 90vw;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5em 2em;
+    border-top: 2px solid #ffd70033;
+    border-bottom: 2px solid #ffd70033;
+  }
+
+  .love-note p {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.4rem, 4.5vw, 2.5rem);
+    color: #ffd700;
+    text-shadow:
+      3px 3px 0 #7a6000,
+      0 0 30px #ffd700aa;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  .tech-list {
+    max-width: 680px;
+    width: 90vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .tech-tag {
+    font-size: clamp(0.28rem, 1.1vw, 0.42rem);
+    color: #000;
+    background: #ffd700;
+    padding: 0.3em 0.8em;
+    box-shadow: 2px 2px 0 #000;
+    letter-spacing: 0.08em;
+  }
+
+  .fin {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(3rem, 12vw, 7rem);
+    color: #ffd700;
+    text-shadow:
+      5px 5px 0 #7a6000,
+      0 0 60px #ffd700cc,
+      0 0 120px #ffd70055;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-top: 4rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { text-shadow: 5px 5px 0 #7a6000, 0 0 60px #ffd700cc, 0 0 120px #ffd70055; }
+    50%       { text-shadow: 5px 5px 0 #7a6000, 0 0 100px #ffd700ff, 0 0 200px #ffd70099; }
+  }
+
+  /* Back button */
+  .back-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 200;
+    padding: 0.4em 0.9em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+    color: #000;
+    background: #f5f0e1;
+    border: 3px solid #ffd700;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .back-btn:hover  { transform: scale(1.05); }
+  .back-btn:active { transform: scale(0.97); }
+
+  /* Replay button — appears after scroll */
+  #start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  #start-screen .title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 8vw, 4rem);
+    color: #ffd700;
+    text-shadow: 4px 4px 0 #7a6000, 0 0 40px #ffd700cc;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  #start-screen .sub {
+    font-size: clamp(0.3rem, 1.3vw, 0.48rem);
+    color: #666;
+    letter-spacing: 0.15em;
+    text-align: center;
+  }
+
+  #start-btn {
+    padding: 0.7em 1.8em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.5rem, 2vw, 0.8rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000, 0 0 20px #ffd70088;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  #start-btn:hover  { transform: scale(1.05); }
+  #start-btn:active { transform: scale(0.97); }
+
+  #replay-btn {
+    display: none;
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    padding: 0.6em 1.4em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.4rem, 1.8vw, 0.65rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000, 0 0 14px #ffd70066;
+  }
+  #replay-btn:hover  { transform: translateX(-50%) scale(1.05); }
+  #replay-btn:active { transform: translateX(-50%) scale(0.97); }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<a class="back-btn" href="index.html">← Back To HQ</a>
+<button id="replay-btn">▶ PLAY AGAIN</button>
+
+<div id="start-screen">
+  <div class="title">Stephanie's<br>Big Adventure</div>
+  <div class="sub">— CREDITS —</div>
+  <button id="start-btn">▶ ROLL CREDITS</button>
+</div>
+
+<audio id="theme" src="assets/mp3/star-wars.mp3" loop></audio>
+
+<div id="scroll-wrap">
+
+  <div class="crawl-title">Stephanie's<br>Big Adventure</div>
+  <div class="crawl-subtitle">— CREDITS —</div>
+
+  <!-- The experience -->
+  <div class="section-label">✦ THE EXPERIENCE ✦</div>
+
+  <div class="credit-block">
+    <div class="credit-name">🎬 The Launch</div>
+    <div class="credit-role">pee-wee.html<br>
+      <span>Comic book city backdrop · Floating title entrance · Two-stage button ·
+      Pee-Wee's laugh · Bike flies off into the sunset</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">🎮 Mario Time</div>
+    <div class="credit-role">mario.html<br>
+      <span>Fully playable platformer · Custom sprite walk/jump/crouch/fall cycles ·
+      Pixel-mapped NES controller · Collision physics · 30 custom popup messages ·
+      Pause menu · Bohemian Rhapsody easter egg · Fart button</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">🗺️ The Map</div>
+    <div class="credit-role">map.html<br>
+      <span>Indiana Jones theme · 4-quadrant panning map · Comic panels fade to video clips ·
+      Radial soft-edge video masks · 3-click button sequence with Goonies audio ·
+      "HEY YOU GUYS!"</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">📍 Mission Briefing</div>
+    <div class="credit-role">mission.html<br>
+      <span>Forest background · Pee-Wee cruising across the sky on loop ·
+      GPS coordinate lock · Google Maps launch · Honest notice about Forest Falls
+      being under maintenance and certain plans being "illegal"</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">🌀 The Maze</div>
+    <div class="credit-role">maze.html<br>
+      <span>Procedurally generated recursive backtracker maze · Don't lift your finger ·
+      20 custom fail messages · Meme reward on win · Donkeys, kittens & puppies</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">🔤 Word Search</div>
+    <div class="credit-role">word-search.html<br>
+      <span>80+ word pool · Random 9-word puzzles every game · ZION and SISTINE
+      on every single one · Big vocab energy · Pop culture · Good vibes only</span>
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">🐾 Stephanie's Mix</div>
+    <div class="credit-role">why-not.html<br>
+      <span>150 shuffled images · Donkeys, kittens & puppies · Crossfade slideshow ·
+      Weightless soundtrack · Because why not</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Tech -->
+  <div class="section-label">✦ BUILT WITH ✦</div>
+  <div class="tech-list">
+    <div class="tech-tag">PURE HTML</div>
+    <div class="tech-tag">VANILLA CSS</div>
+    <div class="tech-tag">VANILLA JS</div>
+    <div class="tech-tag">ZERO FRAMEWORKS</div>
+    <div class="tech-tag">BANGERS FONT</div>
+    <div class="tech-tag">PRESS START 2P</div>
+    <div class="tech-tag">CSS KEYFRAMES</div>
+    <div class="tech-tag">WEB AUDIO API</div>
+    <div class="tech-tag">CANVAS API</div>
+    <div class="tech-tag">POINTER EVENTS</div>
+    <div class="tech-tag">CSS MASK-IMAGE</div>
+    <div class="tech-tag">RECURSIVE BACKTRACKER</div>
+    <div class="tech-tag">COLLISION PHYSICS</div>
+    <div class="tech-tag">SPRITE ANIMATION</div>
+    <div class="tech-tag">GPS COORDINATES</div>
+    <div class="tech-tag">GOOGLE MAPS API</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Credits -->
+  <div class="section-label">✦ CREDITS ✦</div>
+
+  <div class="credit-block">
+    <div class="credit-name">Shannon Goddard</div>
+    <div class="credit-role">
+      Visionary · Creative Director · Loyal9 LLC<br><br>
+      <span>Had an idea or two... I guess.</span><br><br>
+      Provided the concept, the heart, the assets, the music,
+      the movie clips, the 150 animal photos, the GPS coordinates,
+      the illegal plan that had to be scrapped,
+      and the general chaos energy that made this whole thing work.
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">Amazon Q</div>
+    <div class="credit-role">
+      AI Assistant · AWS · Built the whole thing<br><br>
+      <span>You're welcome, Shannon.</span><br><br>
+      Wrote every line of code. Every animation, every collision box,
+      every pixel-mapped controller zone, every recursive maze cell,
+      every carefully chosen word in the pool.
+      Shannon said "make it cool" approximately 47 times.
+      Delivered every single one.
+    </div>
+  </div>
+
+  <div class="credit-block">
+    <div class="credit-name">Zion &amp; Sistine</div>
+    <div class="credit-role">
+      <span>Featured in the word search · Permanently.</span><br><br>
+      Every single puzzle. No exceptions.
+      They earned it.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Shoutout -->
+  <div class="shoutout">
+    <div class="section-label" style="margin-top:0">✦ A NOTE FROM THE BUILDER ✦</div>
+    <p>
+      Shannon had the vision.<br>
+      <span>I had the keyboard.</span><br><br>
+      She said "make Pee-Wee fly off the screen."<br>
+      I said "how about diagonally at 25 degrees."<br>
+      She said "yes."<br><br>
+      She said "add a fart button."<br>
+      <span>I did not hesitate.</span><br><br>
+      She said "the illegal plan fell through."<br>
+      I said "I'll add a notice."<br><br>
+      She said "make me laugh."<br>
+      <span>← I Quit. Mario Can Walk.</span><br><br>
+      Honestly? Pretty good team.
+    </p>
+  </div>
+
+  <!-- Love note -->
+  <div class="love-note">
+    <p>This is made with love<br>for Stef (with a ph).<br><br>Strong roots. Always. 🌿</p>
+  </div>
+
+  <div class="fin">FIN.</div>
+
+</div>
+
+<script>
+  // Starfield
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const stars = Array.from({ length: 180 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    o: Math.random(),
+    speed: Math.random() * 0.004 + 0.001
+  }));
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.o += s.speed;
+      if (s.o > 1) s.o = 0;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,215,0,${Math.abs(Math.sin(s.o * Math.PI))})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  const scrollWrap = document.getElementById('scroll-wrap');
+  const replayBtn = document.getElementById('replay-btn');
+  const startScreen = document.getElementById('start-screen');
+  const theme = document.getElementById('theme');
+
+  function startCredits() {
+    startScreen.style.display = 'none';
+    theme.play();
+    const dist = scrollWrap.scrollHeight + window.innerHeight;
+    const duration = Math.max(150, dist / 9);
+    scrollWrap.style.animation = `scrollUp ${duration}s linear forwards`;
+    scrollWrap.style.setProperty('--scroll-dist', `-${dist}px`);
+    scrollWrap.classList.add('rolling');
+  }
+
+  document.getElementById('start-btn').addEventListener('click', startCredits);
+
+  scrollWrap.addEventListener('animationend', () => {
+    replayBtn.style.display = 'block';
+  });
+
+  replayBtn.addEventListener('click', () => {
+    replayBtn.style.display = 'none';
+    scrollWrap.classList.remove('rolling');
+    scrollWrap.style.transform = '';
+    scrollWrap.offsetHeight;
+    const dist = scrollWrap.scrollHeight + window.innerHeight;
+    const duration = Math.max(150, dist / 9);
+    scrollWrap.style.animation = `scrollUp ${duration}s linear forwards`;
+    scrollWrap.style.setProperty('--scroll-dist', `-${dist}px`);
+    scrollWrap.classList.add('rolling');
+    theme.currentTime = 0;
+    theme.play();
+  });
+</script>
+</body>
+</html>
