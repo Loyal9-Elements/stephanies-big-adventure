@@ -508,7 +508,7 @@
     startScreen.style.display = 'none';
     theme.play();
     const dist = scrollWrap.scrollHeight + window.innerHeight;
-    const duration = Math.max(150, dist / 9);
+    const duration = Math.max(150, dist / 10);
     scrollWrap.style.animation = `scrollUp ${duration}s linear forwards`;
     scrollWrap.style.setProperty('--scroll-dist', `-${dist}px`);
     scrollWrap.classList.add('rolling');
@@ -526,7 +526,7 @@
     scrollWrap.style.transform = '';
     scrollWrap.offsetHeight;
     const dist = scrollWrap.scrollHeight + window.innerHeight;
-    const duration = Math.max(150, dist / 9);
+    const duration = Math.max(150, dist / 10);
     scrollWrap.style.animation = `scrollUp ${duration}s linear forwards`;
     scrollWrap.style.setProperty('--scroll-dist', `-${dist}px`);
     scrollWrap.classList.add('rolling');
