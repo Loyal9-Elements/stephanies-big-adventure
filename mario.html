@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SBA">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="assets/img/apple-touch.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch.png">
 <title>Mario Time</title>
@@ -10,11 +15,13 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: #000;
     touch-action: none;
     user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
   }
   #game {
     position: relative;
