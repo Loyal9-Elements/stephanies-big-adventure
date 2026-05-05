@@ -1,4 +1,4 @@
-const CACHE = 'sba-v4';
+const CACHE = 'sba-v5';
 
 // Cache immediately on install — HTML, CSS, JS, fonts, images
 const PRECACHE = [
