@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SBA">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="assets/img/apple-touch.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch.png">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Indie+Flower&family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Scratch Pad</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100dvh;
+    background: #000;
+    font-family: 'Press Start 2P', monospace;
+    color: #ffd700;
+    overscroll-behavior: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* LIST VIEW */
+  #list-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+    min-height: 100dvh;
+  }
+
+  #list-view h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 8vw, 4rem);
+    color: #ffd700;
+    text-shadow: 4px 4px 0 #7a6000, 0 0 30px #ffd700aa;
+    letter-spacing: 0.06em;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 0.2em;
+  }
+
+  #list-view .subtitle {
+    font-size: clamp(0.3rem, 1.3vw, 0.48rem);
+    color: #555;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  #new-btn {
+    width: 100%;
+    max-width: 420px;
+    padding: 0.8em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.45rem, 1.8vw, 0.7rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000, 0 0 14px #ffd70066;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.05em;
+  }
+  #new-btn:hover { transform: scale(1.02); }
+  #new-btn:active { transform: scale(0.98); }
+
+  #page-list {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .page-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8em 1em;
+    background: #0a0a0a;
+    border: 2px solid #ffd70044;
+    box-shadow: 4px 4px 0 #ffd70022;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .page-item:hover { border-color: #ffd700; }
+
+  .page-item .page-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .page-item .page-title {
+    font-size: clamp(0.35rem, 1.4vw, 0.55rem);
+    color: #ffd700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .page-item .page-date {
+    font-size: clamp(0.25rem, 1vw, 0.38rem);
+    color: #555;
+    letter-spacing: 0.05em;
+  }
+
+  .page-item .delete-btn {
+    font-size: clamp(0.5rem, 2vw, 0.8rem);
+    color: #555;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3em 0.5em;
+    font-family: 'Press Start 2P', monospace;
+  }
+  .page-item .delete-btn:hover { color: #ff4444; }
+
+  .empty-msg {
+    font-size: clamp(0.3rem, 1.3vw, 0.48rem);
+    color: #333;
+    text-align: center;
+    margin-top: 2rem;
+    letter-spacing: 0.08em;
+    line-height: 2;
+  }
+
+  /* EDITOR VIEW */
+  #editor-view {
+    display: none;
+    flex-direction: column;
+    height: 100dvh;
+    padding: 0;
+  }
+
+  #editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1rem;
+    background: #0a0a0a;
+    border-bottom: 2px solid #ffd70033;
+    flex-shrink: 0;
+  }
+
+  #back-btn {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+    color: #000;
+    background: #f5f0e1;
+    border: 3px solid #000;
+    border-radius: 8px;
+    padding: 0.3em 0.7em;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+
+  #highlight-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.3rem, 1.2vw, 0.45rem);
+    color: #000;
+    background: #ffff00;
+    border: 2px solid #000;
+    padding: 0.4em 0.8em;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+  }
+  #highlight-btn:hover { transform: scale(1.05); }
+  #highlight-btn:active { transform: scale(0.97); }
+
+  #save-status {
+    font-size: clamp(0.25rem, 1vw, 0.38rem);
+    color: #555;
+    margin-left: auto;
+    letter-spacing: 0.05em;
+  }
+
+  #editor {
+    flex: 1;
+    width: 100%;
+    padding: 1.5rem 1.2rem;
+    font-family: 'Indie Flower', cursive;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    color: #222;
+    background: #f5f0e1;
+    border: none;
+    outline: none;
+    resize: none;
+    line-height: 2;
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent calc(2em - 1px),
+      #c9b99a33 calc(2em - 1px),
+      #c9b99a33 2em
+    );
+    background-size: 100% 2em;
+    background-attachment: local;
+    overflow-y: auto;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  #editor mark {
+    background: #ffff0088;
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  /* Back button */
+  .back-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 150;
+    padding: 0.4em 0.9em;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    color: #000;
+    background: #f5f0e1;
+    border: 3px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 3px 3px 0 #000;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .back-btn:hover { transform: scale(1.05); }
+  .back-btn:active { transform: scale(0.97); }
+</style>
+</head>
+<body>
+
+<!-- LIST VIEW -->
+<div id="list-view">
+  <a class="back-btn" href="index.html">← Put The Pen Down</a>
+  <h1 style="margin-top:3rem">Scratch Pad</h1>
+  <div class="subtitle">for when the words come back</div>
+  <button id="new-btn">+ NEW PAGE</button>
+  <div id="page-list"></div>
+  <div class="empty-msg" id="empty-msg">nothing here yet.<br>tap + to start writing.</div>
+</div>
+
+<!-- EDITOR VIEW -->
+<div id="editor-view">
+  <div id="editor-toolbar">
+    <button id="back-btn">← Back</button>
+    <button id="highlight-btn">🖍 HIGHLIGHT</button>
+    <span id="save-status">saved</span>
+  </div>
+  <div id="editor" contenteditable="true" spellcheck="true"></div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'sba-scratchpad';
+  const listView = document.getElementById('list-view');
+  const editorView = document.getElementById('editor-view');
+  const pageList = document.getElementById('page-list');
+  const emptyMsg = document.getElementById('empty-msg');
+  const editor = document.getElementById('editor');
+  const saveStatus = document.getElementById('save-status');
+
+  let pages = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let currentId = null;
+  let saveTimer = null;
+
+  function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  function getPreview(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const text = div.textContent.trim();
+    return text.slice(0, 50) || 'untitled';
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+  }
+
+  function renderList() {
+    pageList.innerHTML = '';
+    emptyMsg.style.display = pages.length ? 'none' : 'block';
+    for (const page of pages) {
+      const item = document.createElement('div');
+      item.className = 'page-item';
+      item.innerHTML = `
+        <div class="page-info">
+          <div class="page-title">${getPreview(page.content)}</div>
+          <div class="page-date">${formatDate(page.updated)}</div>
+        </div>
+        <button class="delete-btn" data-id="${page.id}">✕</button>
+      `;
+      item.querySelector('.page-info').addEventListener('click', () => openPage(page.id));
+      item.querySelector('.delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deletePage(page.id);
+      });
+      pageList.appendChild(item);
+    }
+  }
+
+  function openPage(id) {
+    currentId = id;
+    const page = pages.find(p => p.id === id);
+    editor.innerHTML = page.content;
+    listView.style.display = 'none';
+    editorView.style.display = 'flex';
+    saveStatus.textContent = 'saved';
+    editor.focus();
+  }
+
+  function createPage() {
+    const page = { id: generateId(), content: '', created: Date.now(), updated: Date.now() };
+    pages.unshift(page);
+    save();
+    openPage(page.id);
+  }
+
+  function deletePage(id) {
+    pages = pages.filter(p => p.id !== id);
+    save();
+    renderList();
+  }
+
+  function closeEditor() {
+    saveCurrent();
+    currentId = null;
+    editorView.style.display = 'none';
+    listView.style.display = 'flex';
+    renderList();
+  }
+
+  function saveCurrent() {
+    if (!currentId) return;
+    const page = pages.find(p => p.id === currentId);
+    if (page) {
+      page.content = editor.innerHTML;
+      page.updated = Date.now();
+      save();
+      saveStatus.textContent = 'saved';
+    }
+  }
+
+  // Auto-save on input (debounced)
+  editor.addEventListener('input', () => {
+    saveStatus.textContent = 'saving...';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveCurrent, 800);
+  });
+
+  // Highlight selection
+  document.getElementById('highlight-btn').addEventListener('click', () => {
+    const sel = window.getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    // Check if already highlighted — toggle off
+    const parent = range.commonAncestorContainer.parentElement;
+    if (parent && parent.tagName === 'MARK') {
+      const text = document.createTextNode(parent.textContent);
+      parent.replaceWith(text);
+    } else {
+      const mark = document.createElement('mark');
+      range.surroundContents(mark);
+    }
+    sel.removeAllRanges();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveCurrent, 400);
+  });
+
+  // Navigation
+  document.getElementById('new-btn').addEventListener('click', createPage);
+  document.getElementById('back-btn').addEventListener('click', closeEditor);
+
+  // Init
+  renderList();
+</script>
+</body>
+</html>
