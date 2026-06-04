@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SBA">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="assets/img/apple-touch.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch.png">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Game Plan</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100dvh;
+    background: #000;
+    font-family: 'Press Start 2P', monospace;
+    color: #ffd700;
+    overscroll-behavior: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .back-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 150;
+    padding: 0.4em 0.9em;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    color: #000;
+    background: #f5f0e1;
+    border: 3px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 3px 3px 0 #000;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .back-btn:hover { transform: scale(1.05); }
+  .back-btn:active { transform: scale(0.97); }
+
+  /* GOAL LIST */
+  #goal-list-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3.5rem 1rem 3rem;
+  }
+
+  #goal-list-view h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 8vw, 4rem);
+    color: #ffd700;
+    text-shadow: 4px 4px 0 #7a6000, 0 0 30px #ffd700aa;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin-bottom: 0.2em;
+  }
+
+  .subtitle {
+    font-size: clamp(0.3rem, 1.3vw, 0.48rem);
+    color: #555;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  #add-goal-btn {
+    width: 100%;
+    max-width: 480px;
+    padding: 0.8em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.4rem, 1.6vw, 0.6rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000, 0 0 14px #ffd70066;
+    margin-bottom: 1.2rem;
+  }
+  #add-goal-btn:hover { transform: scale(1.02); }
+  #add-goal-btn:active { transform: scale(0.98); }
+
+  #goals-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .goal-row {
+    display: flex;
+    align-items: center;
+    padding: 0.7em 0.8em;
+    background: #0a0a0a;
+    border: 2px solid #ffd70044;
+    box-shadow: 3px 3px 0 #ffd70022;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    gap: 0.6em;
+  }
+  .goal-row:hover { border-color: #ffd700; }
+
+  .goal-row .goal-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .goal-row .goal-info {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .goal-row .goal-name {
+    font-size: clamp(0.35rem, 1.4vw, 0.55rem);
+    color: #ffd700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .goal-row .goal-status {
+    font-size: clamp(0.25rem, 1vw, 0.38rem);
+    color: #555;
+    letter-spacing: 0.05em;
+    margin-top: 0.2em;
+  }
+
+  .goal-row .goal-progress {
+    width: 50px;
+    height: 6px;
+    background: #1a1a1a;
+    border: 1px solid #ffd70033;
+    flex-shrink: 0;
+  }
+
+  .goal-row .goal-progress-fill {
+    height: 100%;
+    background: #ffd700;
+    transition: width 0.3s;
+  }
+
+  /* PLAN VIEW */
+  #plan-view {
+    display: none;
+    flex-direction: column;
+    padding: 3.5rem 1rem 3rem;
+    align-items: center;
+    min-height: 100dvh;
+  }
+
+  #plan-title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.5rem, 6vw, 3rem);
+    color: #ffd700;
+    text-shadow: 3px 3px 0 #7a6000, 0 0 20px #ffd700aa;
+    text-align: center;
+    margin-bottom: 0.3em;
+    letter-spacing: 0.06em;
+  }
+
+  #plan-desc {
+    font-size: clamp(0.28rem, 1.2vw, 0.45rem);
+    color: #888;
+    text-align: center;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+    max-width: 480px;
+  }
+
+  #plan-progress-wrap {
+    width: 100%;
+    max-width: 480px;
+    height: 10px;
+    background: #1a1a1a;
+    border: 1px solid #ffd70033;
+    margin-bottom: 1.2rem;
+  }
+
+  #plan-progress-bar {
+    height: 100%;
+    background: #ffd700;
+    transition: width 0.3s;
+  }
+
+  #steps-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .step-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.6em 0.8em;
+    background: #0a0a0a;
+    border: 2px solid #ffd70022;
+  }
+
+  .step-row.done { border-color: #ffd70066; }
+  .step-row.done .step-text { color: #555; text-decoration: line-through; }
+
+  .step-check {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffd700;
+    background: #000;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .step-check:checked { background: #ffd700; }
+  .step-check:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -3px;
+    left: 1px;
+    font-size: 11px;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .step-text {
+    font-size: clamp(0.32rem, 1.3vw, 0.5rem);
+    color: #ccc;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .step-delete {
+    font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2em 0.4em;
+    font-family: 'Press Start 2P', monospace;
+  }
+  .step-delete:hover { color: #ff4444; }
+
+  #add-step-btn {
+    width: 100%;
+    max-width: 480px;
+    padding: 0.6em;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.35rem, 1.4vw, 0.55rem);
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+  }
+  #add-step-btn:hover { transform: scale(1.02); }
+
+  /* Schedule display */
+  .schedule-block {
+    width: 100%;
+    max-width: 480px;
+    background: #0d0d0d;
+    border: 2px solid #ffd70044;
+    padding: 0.8em 1em;
+    margin-bottom: 0.8rem;
+  }
+
+  .schedule-block .sched-label {
+    font-size: clamp(0.3rem, 1.2vw, 0.45rem);
+    color: #ffd700;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4em;
+  }
+
+  .schedule-block .sched-time {
+    font-size: clamp(0.28rem, 1.1vw, 0.42rem);
+    color: #aaa;
+    letter-spacing: 0.05em;
+  }
+
+  /* Commit form for Rose */
+  #commit-form {
+    width: 100%;
+    max-width: 480px;
+    background: #0d0d0d;
+    border: 3px solid #ffd700;
+    padding: 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+    margin-bottom: 1rem;
+  }
+
+  #commit-form label {
+    font-size: clamp(0.3rem, 1.2vw, 0.45rem);
+    color: #ffd700;
+    letter-spacing: 0.05em;
+  }
+
+  #commit-form input {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.35rem, 1.4vw, 0.55rem);
+    padding: 0.6em;
+    background: #000;
+    border: 2px solid #ffd70066;
+    color: #fff;
+    outline: none;
+  }
+  #commit-form input:focus { border-color: #ffd700; }
+
+  #commit-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.35rem, 1.4vw, 0.55rem);
+    padding: 0.7em;
+    color: #000;
+    background: #ffd700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+  }
+
+  #commit-status {
+    font-size: clamp(0.28rem, 1.1vw, 0.42rem);
+    color: #555;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-btn" href="index.html" id="main-back">← One Step At A Time</a>
+
+<!-- GOAL LIST VIEW -->
+<div id="goal-list-view">
+  <h1>Game Plan</h1>
+  <div class="subtitle">you don't have to do it all today</div>
+  <button id="add-goal-btn">+ ADD GOAL</button>
+  <div id="goals-container"></div>
+</div>
+
+<!-- PLAN VIEW -->
+<div id="plan-view">
+  <div id="plan-title"></div>
+  <div id="plan-desc"></div>
+  <div id="plan-progress-wrap"><div id="plan-progress-bar"></div></div>
+  <div id="steps-container"></div>
+  <button id="add-step-btn">+ ADD STEP</button>
+</div>
+
+<script>
+const STORAGE_KEY = 'sba-gameplan';
+
+const DEFAULT_GOALS = [
+  {
+    id: 'rose',
+    icon: '🌹',
+    name: 'Meet Rose',
+    desc: 'Rose is a chaplain. Shannon will be there. Just pick a day and time.',
+    type: 'commit',
+    commitDate: '',
+    commitTime: '',
+    steps: []
+  },
+  {
+    id: 'house',
+    icon: '🏠',
+    name: 'The House Situation',
+    desc: 'Call your brother. Either way, you\'re picking a move out date.',
+    type: 'house',
+    brotherAnswer: '',
+    moveOutDate: '',
+    packDay: '',
+    packTime: '',
+    packStartWeek: '',
+    calledDad: false,
+    steps: []
+  },
+  {
+    id: 'gym',
+    icon: '💪',
+    name: 'Gym — Zion & Stef',
+    desc: 'Bonding time. Two days a week. No excuses.',
+    type: 'schedule',
+    schedule: [
+      { day: 'Monday', time: '5:00 PM – 6:00 PM' },
+      { day: 'Friday', time: '5:00 PM – 6:00 PM' }
+    ],
+    steps: [
+      { text: 'Get gym membership (both)', done: false },
+      { text: 'Pick workout playlist', done: false },
+      { text: 'Show up Monday. That\'s it.', done: false }
+    ]
+  },
+  {
+    id: 'family-time',
+    icon: '💜',
+    name: 'Family Time',
+    desc: 'All must be present. Goals, dreams, interests, what you want out of life. Can that be a business idea? Yes. Yes it can.',
+    type: 'schedule',
+    schedule: [
+      { day: 'Monday', time: '7:00 PM – 9:00 PM' },
+      { day: 'Friday', time: '7:00 PM – 9:00 PM' }
+    ],
+    steps: [
+      { text: 'Pick a topic for this week', done: false },
+      { text: 'Everyone shares one goal', done: false },
+      { text: 'Everyone shares one dream', done: false },
+      { text: 'Everyone shares one interest', done: false },
+      { text: 'Brainstorm: can any of these be a business?', done: false }
+    ]
+  },
+  {
+    id: 'zion-dmv',
+    icon: '🚗',
+    name: 'Zion — DMV Permit',
+    desc: '',
+    type: 'checklist',
+    steps: [
+      { text: 'Gather ID documents', done: false },
+      { text: 'Study for permit test', done: false },
+      { text: 'Schedule DMV appointment', done: false },
+      { text: 'Pass permit test', done: false },
+      { text: 'Schedule behind-the-wheel', done: false }
+    ]
+  },
+  {
+    id: 'sistine-dmv',
+    icon: '🚗',
+    name: 'Sistine — DMV Permit',
+    desc: 'Behind the wheel might be done — verify.',
+    type: 'checklist',
+    steps: [
+      { text: 'Gather ID documents', done: false },
+      { text: 'Study for permit test', done: false },
+      { text: 'Schedule DMV appointment', done: false },
+      { text: 'Pass permit test', done: false },
+      { text: 'Verify behind-the-wheel status', done: false }
+    ]
+  },
+  {
+    id: 'dusthim',
+    icon: '📱',
+    name: 'Dust Him — App Launch',
+    desc: 'The app is BUILT. Just need 2-3 hours with Shannon for final setup.',
+    type: 'checklist',
+    steps: [
+      { text: 'Pick final colors', done: false },
+      { text: 'Choose app photos/assets', done: false },
+      { text: 'Set up Apple Developer account', done: false },
+      { text: 'Set up Google Play account', done: false },
+      { text: 'Set up Twilio', done: false },
+      { text: 'Set up Supabase', done: false },
+      { text: 'Sit with Shannon (2-3 hrs)', done: false },
+      { text: 'Submit to app stores', done: false }
+    ]
+  },
+  {
+    id: 'money',
+    icon: '💰',
+    name: 'Money & Bank',
+    desc: 'Once the money hits, call Shannon. She\'ll help schedule Schools First.',
+    type: 'money',
+    moneyReceived: false,
+    calledShannon: false,
+    sistineHasID: '',
+    zionHasID: '',
+    bankDate: '',
+    bankTime: '',
+    steps: []
+  }
+];
+
+let goals = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || JSON.parse(JSON.stringify(DEFAULT_GOALS));
+let currentGoalId = null;
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(goals)); }
+
+function getProgress(goal) {
+  if (goal.type === 'house') {
+    return (goal.brotherAnswer ? 25 : 0) + (goal.moveOutDate ? 25 : 0) + (goal.packDay ? 25 : 0) + (goal.calledDad ? 25 : 0);
+  }
+  if (goal.type === 'money') {
+    let p = 0;
+    if (goal.moneyReceived) p += 25;
+    if (goal.calledShannon) p += 25;
+    if (goal.bankDate) p += 25;
+    if (goal.sistineHasID && goal.zionHasID) p += 25;
+    return p;
+  }
+  if (!goal.steps.length) return 0;
+  const done = goal.steps.filter(s => s.done).length;
+  return Math.round((done / goal.steps.length) * 100);
+}
+
+function getStatus(goal) {
+  if (goal.type === 'commit') {
+    return goal.commitDate ? `Scheduled: ${goal.commitDate} ${goal.commitTime}` : 'Not scheduled yet';
+  }
+  if (goal.type === 'house') {
+    if (goal.calledDad) return '✓ Dad knows!';
+    if (goal.moveOutDate) return `Moving: ${goal.moveOutDate}`;
+    if (goal.brotherAnswer) return 'Brother called ✓';
+    return 'Call your brother';
+  }
+  if (goal.type === 'money') {
+    if (!goal.moneyReceived) return 'Waiting on funds';
+    if (goal.bankDate) return `Bank appt: ${goal.bankDate}`;
+    if (goal.calledShannon) return 'Shannon called ✓';
+    return 'Money received — call Shannon!';
+  }
+  const p = getProgress(goal);
+  if (p === 0) return 'Not started';
+  if (p === 100) return '✓ Complete!';
+  return `${p}% done`;
+}
+
+// GOAL LIST
+function renderGoalList() {
+  const container = document.getElementById('goals-container');
+  container.innerHTML = '';
+  for (const goal of goals) {
+    const row = document.createElement('div');
+    row.className = 'goal-row';
+    const p = getProgress(goal);
+    row.innerHTML = `
+      <div class="goal-icon">${goal.icon}</div>
+      <div class="goal-info">
+        <div class="goal-name">${goal.name}</div>
+        <div class="goal-status">${getStatus(goal)}</div>
+      </div>
+      <div class="goal-progress"><div class="goal-progress-fill" style="width:${p}%"></div></div>
+    `;
+    row.addEventListener('click', () => openPlan(goal.id));
+    container.appendChild(row);
+  }
+}
+
+// PLAN VIEW
+function openPlan(id) {
+  currentGoalId = id;
+  const goal = goals.find(g => g.id === id);
+  document.getElementById('goal-list-view').style.display = 'none';
+  document.getElementById('plan-view').style.display = 'flex';
+  document.getElementById('plan-title').textContent = goal.name;
+  document.getElementById('plan-desc').textContent = goal.desc;
+  document.getElementById('main-back').textContent = '← Back To Goals';
+  document.getElementById('main-back').href = '#';
+  document.getElementById('main-back').onclick = (e) => { e.preventDefault(); closePlan(); };
+  renderPlan(goal);
+}
+
+function closePlan() {
+  currentGoalId = null;
+  document.getElementById('plan-view').style.display = 'none';
+  document.getElementById('goal-list-view').style.display = 'flex';
+  document.getElementById('main-back').textContent = '← One Step At A Time';
+  document.getElementById('main-back').href = 'index.html';
+  document.getElementById('main-back').onclick = null;
+  renderGoalList();
+}
+
+function renderPlan(goal) {
+  const stepsContainer = document.getElementById('steps-container');
+  const addStepBtn = document.getElementById('add-step-btn');
+  stepsContainer.innerHTML = '';
+
+  // Schedule block
+  if (goal.type === 'schedule' && goal.schedule) {
+    for (const s of goal.schedule) {
+      const block = document.createElement('div');
+      block.className = 'schedule-block';
+      block.innerHTML = `<div class="sched-label">${s.day}</div><div class="sched-time">${s.time}</div>`;
+      stepsContainer.appendChild(block);
+    }
+  }
+
+  // Money & Bank
+  if (goal.type === 'money') {
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <div class="schedule-block">
+        <div class="sched-label">STEP 1 — Has Money Been Received?</div>
+        <div style="display:flex;gap:0.8em;margin-top:0.5em">
+          <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em">
+            <input type="radio" name="money" value="yes" ${goal.moneyReceived ? 'checked' : ''}> YES
+          </label>
+          <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em">
+            <input type="radio" name="money" value="no" ${!goal.moneyReceived ? 'checked' : ''}> NO
+          </label>
+        </div>
+        <div style="font-size:clamp(0.25rem,1vw,0.35rem);color:#555;margin-top:0.4em">${goal.moneyReceived ? '💰 Let\'s go!' : 'waiting... it\'ll come.'}</div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem;${!goal.moneyReceived ? 'opacity:0.3;pointer-events:none' : ''}">
+        <div class="sched-label">STEP 2 — Call Shannon</div>
+        <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em;margin-top:0.4em">
+          <input type="checkbox" class="step-check" id="called-shannon" ${goal.calledShannon ? 'checked' : ''}> Done. Shannon knows.
+        </label>
+        <div style="font-size:clamp(0.25rem,1vw,0.35rem);color:#555;margin-top:0.3em">Shannon will help schedule Schools First appointment.</div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem;${!goal.calledShannon ? 'opacity:0.3;pointer-events:none' : ''}">
+        <div class="sched-label">STEP 3 — Bank Appointment</div>
+        <div style="font-size:clamp(0.25rem,1vw,0.35rem);color:#aaa;margin-top:0.3em">Stephanie + Sistine + Zion — all must be present.</div>
+        <div style="display:flex;gap:0.5em;margin-top:0.4em">
+          <input type="date" id="bank-date" value="${goal.bankDate || ''}" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.25rem,1vw,0.38rem);padding:0.4em;background:#000;border:2px solid #ffd70066;color:#fff;flex:1">
+          <input type="time" id="bank-time" value="${goal.bankTime || ''}" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.25rem,1vw,0.38rem);padding:0.4em;background:#000;border:2px solid #ffd70066;color:#fff;flex:1">
+        </div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem;${!goal.moneyReceived ? 'opacity:0.3;pointer-events:none' : ''}">
+        <div class="sched-label">⚠️ ID CHECK — Does everyone have valid CA IDs?</div>
+        <div style="margin-top:0.5em">
+          <div style="font-size:clamp(0.28rem,1.1vw,0.42rem);color:#ccc;margin-bottom:0.4em">Sistine has valid CA ID?</div>
+          <div style="display:flex;gap:0.8em">
+            <label style="font-size:clamp(0.28rem,1vw,0.4rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.3em">
+              <input type="radio" name="sistine-id" value="yes" ${goal.sistineHasID==='yes'?'checked':''}> Yes
+            </label>
+            <label style="font-size:clamp(0.28rem,1vw,0.4rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.3em">
+              <input type="radio" name="sistine-id" value="no" ${goal.sistineHasID==='no'?'checked':''}> No — add to DMV list
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:0.6em">
+          <div style="font-size:clamp(0.28rem,1.1vw,0.42rem);color:#ccc;margin-bottom:0.4em">Zion has valid CA ID?</div>
+          <div style="display:flex;gap:0.8em">
+            <label style="font-size:clamp(0.28rem,1vw,0.4rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.3em">
+              <input type="radio" name="zion-id" value="yes" ${goal.zionHasID==='yes'?'checked':''}> Yes
+            </label>
+            <label style="font-size:clamp(0.28rem,1vw,0.4rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.3em">
+              <input type="radio" name="zion-id" value="no" ${goal.zionHasID==='no'?'checked':''}> No — add to DMV list
+            </label>
+          </div>
+        </div>
+      </div>
+      <button id="money-save-btn" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.35rem,1.4vw,0.55rem);padding:0.7em;color:#000;background:#ffd700;border:none;cursor:pointer;box-shadow:3px 3px 0 #000;width:100%;margin-top:0.8rem">SAVE</button>
+    `;
+    stepsContainer.appendChild(block);
+    setTimeout(() => {
+      document.getElementById('money-save-btn').addEventListener('click', () => {
+        const moneyRadios = document.querySelectorAll('input[name="money"]');
+        for (const r of moneyRadios) { if (r.checked) goal.moneyReceived = r.value === 'yes'; }
+        goal.calledShannon = document.getElementById('called-shannon').checked;
+        goal.bankDate = document.getElementById('bank-date').value;
+        goal.bankTime = document.getElementById('bank-time').value;
+        const sistineRadios = document.querySelectorAll('input[name="sistine-id"]');
+        for (const r of sistineRadios) { if (r.checked) goal.sistineHasID = r.value; }
+        const zionRadios = document.querySelectorAll('input[name="zion-id"]');
+        for (const r of zionRadios) { if (r.checked) goal.zionHasID = r.value; }
+        save();
+        renderPlan(goal);
+      });
+    }, 0);
+    addStepBtn.style.display = 'none';
+    const mp = getProgress(goal);
+    document.getElementById('plan-progress-bar').style.width = mp + '%';
+    return;
+  }
+
+  // House situation
+  if (goal.type === 'house') {
+    const block = document.createElement('div');
+    block.innerHTML = `
+      <div class="schedule-block">
+        <div class="sched-label">STEP 1 — Call Your Brother</div>
+        <div style="display:flex;gap:0.8em;margin-top:0.5em">
+          <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em">
+            <input type="radio" name="bro" value="yes" ${goal.brotherAnswer === 'yes' ? 'checked' : ''}> He said YES
+          </label>
+          <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em">
+            <input type="radio" name="bro" value="no" ${goal.brotherAnswer === 'no' ? 'checked' : ''}> He said NO
+          </label>
+        </div>
+        <div style="font-size:clamp(0.25rem,1vw,0.35rem);color:#555;margin-top:0.4em">${goal.brotherAnswer ? (goal.brotherAnswer === 'yes' ? 'Cool. Either way...' : 'Cool. Either way...') : 'either answer leads to the same next step 😂'}</div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem">
+        <div class="sched-label">STEP 2 — Commit To Move Out Date</div>
+        <input type="date" id="moveout-date" value="${goal.moveOutDate || ''}" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.3rem,1.2vw,0.45rem);padding:0.5em;background:#000;border:2px solid #ffd70066;color:#fff;margin-top:0.4em;width:100%">
+        <div style="font-size:clamp(0.25rem,1vw,0.35rem);color:#555;margin-top:0.3em">${goal.moveOutDate ? 'Locked in: ' + goal.moveOutDate : 'pick a date. any date. that\'s yours now.'}</div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem">
+        <div class="sched-label">STEP 3 — Shannon Packing Help</div>
+        <label style="font-size:clamp(0.25rem,1vw,0.38rem);color:#aaa;display:block;margin-top:0.3em">Start week:</label>
+        <input type="date" id="pack-week" value="${goal.packStartWeek || ''}" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.3rem,1.2vw,0.45rem);padding:0.5em;background:#000;border:2px solid #ffd70066;color:#fff;width:100%">
+        <label style="font-size:clamp(0.25rem,1vw,0.38rem);color:#aaa;display:block;margin-top:0.3em">Day & time each week:</label>
+        <div style="display:flex;gap:0.5em;margin-top:0.3em">
+          <select id="pack-day" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.25rem,1vw,0.38rem);padding:0.4em;background:#000;border:2px solid #ffd70066;color:#fff;flex:1">
+            <option value="">Day...</option>
+            <option ${goal.packDay==='Monday'?'selected':''}>Monday</option>
+            <option ${goal.packDay==='Tuesday'?'selected':''}>Tuesday</option>
+            <option ${goal.packDay==='Wednesday'?'selected':''}>Wednesday</option>
+            <option ${goal.packDay==='Thursday'?'selected':''}>Thursday</option>
+            <option ${goal.packDay==='Friday'?'selected':''}>Friday</option>
+            <option ${goal.packDay==='Saturday'?'selected':''}>Saturday</option>
+            <option ${goal.packDay==='Sunday'?'selected':''}>Sunday</option>
+          </select>
+          <input type="time" id="pack-time" value="${goal.packTime || ''}" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.25rem,1vw,0.38rem);padding:0.4em;background:#000;border:2px solid #ffd70066;color:#fff;flex:1">
+        </div>
+      </div>
+      <div class="schedule-block" style="margin-top:0.5rem">
+        <div class="sched-label">STEP 4 — Call Dad With Move-In Date!</div>
+        <label style="font-size:clamp(0.3rem,1.2vw,0.45rem);color:#ccc;cursor:pointer;display:flex;align-items:center;gap:0.4em;margin-top:0.4em">
+          <input type="checkbox" class="step-check" id="called-dad" ${goal.calledDad ? 'checked' : ''}> Done. Dad knows.
+        </label>
+      </div>
+      <button id="house-save-btn" style="font-family:'Press Start 2P',monospace;font-size:clamp(0.35rem,1.4vw,0.55rem);padding:0.7em;color:#000;background:#ffd700;border:none;cursor:pointer;box-shadow:3px 3px 0 #000;width:100%;margin-top:0.8rem">SAVE</button>
+    `;
+    stepsContainer.appendChild(block);
+    setTimeout(() => {
+      document.getElementById('house-save-btn').addEventListener('click', () => {
+        const radios = document.querySelectorAll('input[name="bro"]');
+        for (const r of radios) { if (r.checked) goal.brotherAnswer = r.value; }
+        goal.moveOutDate = document.getElementById('moveout-date').value;
+        goal.packStartWeek = document.getElementById('pack-week').value;
+        goal.packDay = document.getElementById('pack-day').value;
+        goal.packTime = document.getElementById('pack-time').value;
+        goal.calledDad = document.getElementById('called-dad').checked;
+        save();
+        renderPlan(goal);
+      });
+    }, 0);
+    addStepBtn.style.display = 'none';
+    document.getElementById('plan-progress-bar').style.width =
+      ((goal.brotherAnswer ? 25 : 0) + (goal.moveOutDate ? 25 : 0) + (goal.packDay ? 25 : 0) + (goal.calledDad ? 25 : 0)) + '%';
+    return;
+  }
+
+  // Commit form for Rose
+  if (goal.type === 'commit') {
+    const form = document.createElement('div');
+    form.id = 'commit-form';
+    form.innerHTML = `
+      <label>PICK A DATE:</label>
+      <input type="date" id="commit-date" value="${goal.commitDate || ''}">
+      <label>PICK A TIME:</label>
+      <input type="time" id="commit-time" value="${goal.commitTime || ''}">
+      <button id="commit-btn">${goal.commitDate ? '✓ UPDATE' : 'COMMIT'}</button>
+      <div id="commit-status">${goal.commitDate ? 'Scheduled: ' + goal.commitDate + ' ' + goal.commitTime : 'no pressure. just pick one.'}</div>
+    `;
+    stepsContainer.appendChild(form);
+    setTimeout(() => {
+      document.getElementById('commit-btn').addEventListener('click', () => {
+        goal.commitDate = document.getElementById('commit-date').value;
+        goal.commitTime = document.getElementById('commit-time').value;
+        document.getElementById('commit-status').textContent = goal.commitDate
+          ? 'Scheduled: ' + goal.commitDate + ' ' + goal.commitTime
+          : 'no pressure. just pick one.';
+        save();
+      });
+    }, 0);
+  }
+
+  // Steps
+  for (let i = 0; i < goal.steps.length; i++) {
+    const step = goal.steps[i];
+    const row = document.createElement('div');
+    row.className = 'step-row' + (step.done ? ' done' : '');
+    row.innerHTML = `
+      <input type="checkbox" class="step-check" ${step.done ? 'checked' : ''} data-idx="${i}">
+      <span class="step-text">${step.text}</span>
+      <button class="step-delete" data-idx="${i}">✕</button>
+    `;
+    stepsContainer.appendChild(row);
+  }
+
+  // Progress bar
+  const p = getProgress(goal);
+  document.getElementById('plan-progress-bar').style.width = p + '%';
+
+  // Events
+  stepsContainer.querySelectorAll('.step-check').forEach(chk => {
+    chk.addEventListener('change', () => {
+      goal.steps[chk.dataset.idx].done = chk.checked;
+      save();
+      renderPlan(goal);
+    });
+  });
+
+  stepsContainer.querySelectorAll('.step-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      goal.steps.splice(btn.dataset.idx, 1);
+      save();
+      renderPlan(goal);
+    });
+  });
+
+  addStepBtn.style.display = goal.type === 'commit' ? 'none' : 'block';
+}
+
+// Add step
+document.getElementById('add-step-btn').addEventListener('click', () => {
+  const goal = goals.find(g => g.id === currentGoalId);
+  const text = prompt('New step:');
+  if (text && text.trim()) {
+    goal.steps.push({ text: text.trim(), done: false });
+    save();
+    renderPlan(goal);
+  }
+});
+
+// Add goal
+document.getElementById('add-goal-btn').addEventListener('click', () => {
+  const name = prompt('Goal name:');
+  if (name && name.trim()) {
+    goals.push({
+      id: Date.now().toString(36),
+      icon: '🎯',
+      name: name.trim(),
+      desc: '',
+      type: 'checklist',
+      steps: []
+    });
+    save();
+    renderGoalList();
+  }
+});
+
+// Init
+renderGoalList();
+</script>
+</body>
+</html>
