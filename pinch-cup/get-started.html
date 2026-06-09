@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinch Cup — Getting Started</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --accent: #00e5ff;
+      --gold: #ffd700;
+      --green: #00e676;
+      --text: #e0e0e0;
+      --muted: #888;
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 2rem 1.5rem 4rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      border: 1px solid #333;
+      padding: 0.4em 1em;
+      border-radius: 50px;
+      transition: border-color 0.2s;
+    }
+    .back-link:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 0.3em;
+      line-height: 1.1;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .intro {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      max-width: 600px;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      color: #fff;
+      letter-spacing: 1px;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid #222;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid #2a2a2a;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      position: relative;
+      border-left: 4px solid var(--accent);
+    }
+
+    .step-card .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 0.3em;
+    }
+
+    .step-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .step-card ul li {
+      padding: 0.3em 0;
+      padding-left: 1.2em;
+      position: relative;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .step-card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .step-card .cost {
+      display: inline-block;
+      margin-top: 0.6em;
+      background: #0d2a2a;
+      border: 1px solid #00e5ff33;
+      color: var(--green);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.3em 0.8em;
+      border-radius: 4px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 2rem;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 0.6em 0.8em;
+      border-bottom: 2px solid #333;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.6em 0.8em;
+      border-bottom: 1px solid #1f1f1f;
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .profit-table td:last-child {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Callouts */
+    .callout {
+      background: #1a1400;
+      border: 1px solid #ffd70033;
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+      color: var(--gold);
+      line-height: 1.8;
+    }
+
+    .callout strong { color: #fff; }
+
+    .note-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .note-list li {
+      padding: 0.4em 0;
+      padding-left: 1.5em;
+      position: relative;
+      font-size: 0.9rem;
+    }
+
+    .note-list li::before {
+      content: '⚡';
+      position: absolute;
+      left: 0;
+    }
+
+    .growth-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .growth-list li {
+      padding: 0.5em 0;
+      padding-left: 1.5em;
+      position: relative;
+      font-size: 0.95rem;
+    }
+
+    .growth-list li::before {
+      content: '🚀';
+      position: absolute;
+      left: 0;
+    }
+
+    .total-box {
+      background: linear-gradient(135deg, #0d2a2a, #1a1a1a);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .total-box .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .total-box .amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .total-box .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.3em;
+    }
+
+    .break-even {
+      background: #0a1a0a;
+      border: 1px solid #00e67633;
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .break-even p {
+      font-size: 0.9rem;
+      padding: 0.3em 0;
+      color: var(--green);
+    }
+
+    .break-even strong { color: #fff; }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid #222;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 2;
+    }
+
+    .footer-note span { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Pinch Cup</a>
+
+<h1>PINCH CUP<br><span>Getting Started Guide</span></h1>
+<p class="intro">Everything you need to go from idea to income. Step by step. No fluff. You're closer than you think, Stef.</p>
+
+<h2>Step-by-Step Launch Plan</h2>
+
+<div class="step-card">
+  <div class="step-num">STEP 1 — Validate the Product</div>
+  <ul>
+    <li>Order a sample from <a href="https://www.totallypromotional.com/12oz-color-changing-stadium-cup.html">TotallyPromotional</a> to confirm the cup walls are thin/flexible enough to pinch shut</li>
+    <li>Test with cold liquids to see the color change in person</li>
+    <li>If it doesn't pinch well, research thinner-walled alternatives before committing to bulk</li>
+  </ul>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 2 — Form an LLC (California)</div>
+  <ul>
+    <li>File with the California Secretary of State: <a href="https://bizfileonline.sos.ca.gov">bizfileonline.sos.ca.gov</a></li>
+    <li>Protects personal assets from business liability</li>
+  </ul>
+  <div class="cost">Cost: $70</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 3 — Get a California Seller's Permit</div>
+  <ul>
+    <li>Apply through CDTFA: <a href="https://www.cdtfa.ca.gov/">cdtfa.ca.gov</a></li>
+    <li>Required to collect sales tax and buy inventory tax-free for resale</li>
+    <li>File sales tax returns quarterly or annually</li>
+  </ul>
+  <div class="cost">Cost: Free</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 4 — Finalize Designs</div>
+  <ul>
+    <li>Designs must be <strong>one-color artwork</strong> (black or white recommended)</li>
+    <li>Imprint area: 3.5"W × 2"H per side</li>
+    <li>Free 2nd side imprint — use for branding or a second design</li>
+    <li>Bold line art and text works best for single-color printing</li>
+    <li>10 cup color combos available (Blue→Purple, Frosted→Red, Yellow→Green, etc.)</li>
+  </ul>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 5 — Place First Order (500 cups)</div>
+  <ul>
+    <li>Use code <strong>EXTRA10</strong> for 10% off</li>
+    <li>500 cups × $0.90 = $450</li>
+    <li>Setup charge: $45 (one-time per design)</li>
+    <li>Delivery: Free</li>
+  </ul>
+  <div class="cost">Cost: ~$495</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 6 — Create Amazon Seller Account</div>
+  <ul>
+    <li>Sign up at <a href="https://sellercentral.amazon.com">sellercentral.amazon.com</a></li>
+    <li>Choose <strong>Professional plan</strong> ($39.99/month) for FBA access</li>
+    <li>Purchase a <strong>UPC barcode</strong> from GS1: <a href="https://www.gs1us.org">gs1us.org</a></li>
+  </ul>
+  <div class="cost">Cost: ~$40/month + $30 for barcode</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 7 — Ship Inventory to Amazon FBA</div>
+  <ul>
+    <li>Create your product listing with great photos and keywords</li>
+    <li>Keywords: "no spill stadium cup," "pinch cup," "boat cup," "adult party cup," "color changing cup"</li>
+    <li>Print Amazon FNSKU labels, prep shipment, send to warehouse</li>
+    <li>Amazon handles storage, packing, shipping, and returns</li>
+  </ul>
+  <div class="cost">Cost: ~$50–100 shipping to FBA</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 8 — Launch the Landing Page</div>
+  <ul>
+    <li>Point your domain to the Pinch Cup website</li>
+    <li>Update the Amazon button with your real listing URL</li>
+  </ul>
+  <div class="cost">Cost: ~$12/year for domain</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 9 — Sell at Local Events</div>
+  <ul>
+    <li>Farmers markets, boat shows, beer festivals, tailgate events, lake parties</li>
+    <li>Bring inventory + QR code to Amazon listing</li>
+    <li>Accept payments via Square, Venmo, or cash</li>
+  </ul>
+  <div class="cost">Cost: ~$50–150 per table rental</div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">STEP 10 — Protect the Brand</div>
+  <ul>
+    <li>Search USPTO for "Pinch Cup": <a href="https://tmsearch.uspto.gov">tmsearch.uspto.gov</a></li>
+    <li>If clear, file a trademark application</li>
+    <li>Once approved, enroll in <strong>Amazon Brand Registry</strong> for listing protection + A+ content</li>
+  </ul>
+  <div class="cost">Cost: ~$250–350 for trademark</div>
+</div>
+
+<h2>Estimated Startup Costs</h2>
+
+<table>
+  <tr><th>Item</th><th>Cost</th></tr>
+  <tr><td>California LLC</td><td>$70</td></tr>
+  <tr><td>Seller's Permit</td><td>Free</td></tr>
+  <tr><td>First order (500 cups + setup)</td><td>$495</td></tr>
+  <tr><td>Amazon Professional Seller (month 1)</td><td>$40</td></tr>
+  <tr><td>UPC Barcode (GS1)</td><td>$30</td></tr>
+  <tr><td>Shipping to Amazon FBA</td><td>~$75</td></tr>
+  <tr><td>Domain name</td><td>$12</td></tr>
+  <tr><td>First event table rental</td><td>~$100</td></tr>
+  <tr><td>Product liability insurance (annual)</td><td>~$400</td></tr>
+  <tr><td>Trademark (optional but recommended)</td><td>~$300</td></tr>
+  <tr><td><strong>TOTAL</strong></td><td><strong>~$1,522</strong></td></tr>
+</table>
+
+<div class="total-box">
+  <div class="label">Total Estimated Startup</div>
+  <div class="amount">~$1,522</div>
+  <div class="note">That's it. For a real business. With real margins.</div>
+</div>
+
+<h2>Profit Estimates</h2>
+
+<h3>Amazon Sales (per cup)</h3>
+<table class="profit-table">
+  <tr><td>Sell price</td><td>$12.99–$14.99</td></tr>
+  <tr><td>Cup cost</td><td>$0.99</td></tr>
+  <tr><td>Amazon fees (referral + FBA)</td><td>~$5.50</td></tr>
+  <tr><td><strong>Profit per cup</strong></td><td><strong>~$6.50–$8.50</strong></td></tr>
+</table>
+
+<h3>Event Sales (per cup)</h3>
+<table class="profit-table">
+  <tr><td>Sell price</td><td>$10.00–$12.00</td></tr>
+  <tr><td>Cup cost</td><td>$0.99</td></tr>
+  <tr><td><strong>Profit per cup</strong></td><td><strong>~$9.00–$11.00</strong></td></tr>
+</table>
+
+<div class="break-even">
+  <p>📦 At $6.50 profit/cup on Amazon: <strong>sell ~77 cups</strong> to cover startup costs</p>
+  <p>🎪 At $10 profit/cup at events: <strong>sell ~50 cups</strong> to break even</p>
+  <p>🏆 With 500 cups in the first order, you're profitable well within the first batch</p>
+</div>
+
+<h2>Important Notes</h2>
+
+<ul class="note-list">
+  <li><strong>One-color imprint only</strong> — designs need to be bold, simple line art</li>
+  <li><strong>Cup height is 4-3/16"</strong> — shorter than a typical tall stadium cup, standard 12 oz size</li>
+  <li><strong>Hand-wash only</strong> — include this in Amazon listing care instructions</li>
+  <li><strong>Prop 65 (California)</strong> — confirm with manufacturer that no listed substances are present</li>
+  <li><strong>Product liability insurance</strong> — Amazon may require this after $10K in sales</li>
+  <li><strong>Order samples first</strong> — test the pinch mechanic before committing to 500 units</li>
+  <li><strong>Scale up</strong> — at 2,500 cups the cost drops to $0.68/cup, boosting margins significantly</li>
+</ul>
+
+<h2>Future Growth Ideas</h2>
+
+<ul class="growth-list">
+  <li>Test which designs sell best at events before scaling on Amazon</li>
+  <li>Film TikTok/Instagram content: boat wake tests, Jeep trails, tailgate chaos</li>
+  <li>Offer multi-packs on Amazon (4-pack, 6-pack) for higher average order value</li>
+  <li>Seasonal/limited-edition designs to create urgency</li>
+  <li>Reach out to boat rental companies, party bus operators, and breweries for bulk/wholesale deals</li>
+</ul>
+
+<div class="callout">
+  <strong>Hey Stef.</strong><br>
+  This isn't a dream. It's math. The numbers work. The cup exists. The website is built. The only thing between you and this being real is placing that first sample order.<br><br>
+  <span>One step at a time. You got this. 🤏</span>
+</div>
+
+<div class="footer-note">
+  Built by <span>Shannon + Amazon Q</span><br>
+  For Stef (with a ph). Strong roots. Always. 🌿
+</div>
+
+</body>
+</html>
